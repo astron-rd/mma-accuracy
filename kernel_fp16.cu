@@ -1,0 +1,45 @@
+#include <cuda_fp16.h>
+#include <mma.h>
+
+using namespace nvcuda::wmma;
+
+constexpr int M = 16;
+constexpr int N = 16;
+constexpr int K = 16;
+
+using DTYPE = half;
+
+__global__ void kernel(const float *A, const float *B, float *C) {
+  if (threadIdx.x >= 32) {
+    return;
+  }
+
+  fragment<matrix_a, M, N, K, DTYPE, row_major> a;
+  fragment<matrix_b, M, N, K, DTYPE, col_major> b;
+  fragment<accumulator, M, N, K, float> c, d;
+  fill_fragment(c, 0.0f);
+  fill_fragment(d, 0.0f);
+
+  __shared__ DTYPE tmpA[M * K];
+  __shared__ DTYPE tmpB[K * N];
+
+  for (int i = threadIdx.x; i < M * K; i += blockDim.x) {
+    tmpA[i] = __float2half(A[i]);
+  }
+
+  for (int i = threadIdx.x; i < K * N; i += blockDim.x) {
+    tmpB[i] = __float2half(B[i]);
+  }
+
+  __syncthreads();
+
+  // Load fragments from the FP16 arrays
+  load_matrix_sync(a, tmpA, K);
+  load_matrix_sync(b, tmpB, K);
+
+  // Perform matrix multiplication
+  mma_sync(c, a, b, d);
+
+  // Store result
+  store_matrix_sync(C, c, N, nvcuda::wmma::mem_row_major);
+}
