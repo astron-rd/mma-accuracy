@@ -10,10 +10,7 @@ int main() {
   GEMM reference(M, N, K);
   GEMM_E3M2 gpu(M, N, K);
 
-  const double min_normal_value = FP6_E3M2_MIN_NORMAL;
-  const double max_normal_value = FP6_E3M2_MAX_NORMAL;
-
-  run_test(M, N, K, reference, gpu, min_normal_value, max_normal_value);
+  run_test(M, N, K, reference, gpu, FP6_E3M2_MIN_NORMAL, FP6_E3M2_MAX_NORMAL);
 
   return 0;
 }

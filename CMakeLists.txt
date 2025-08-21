@@ -11,6 +11,7 @@ if(CMAKE_CUDA_ARCHITECTURE STREQUAL 120)
 endif()
 
 add_library(GEMM OBJECT GEMM.cpp GEMM_GPU.cu)
+
 foreach(precision ${PRECISISONS})
   add_executable(test-${precision} main_${precision}.cu kernel_${precision}.cu)
   target_link_libraries(test-${precision} $<TARGET_OBJECTS:GEMM>)
