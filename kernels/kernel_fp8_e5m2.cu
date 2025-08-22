@@ -33,6 +33,20 @@ mma_sync_ptx(fragment<accumulator, M, N, K, float> &d,
 }
 
 __device__ inline void
+load_matrix_sync(fragment<accumulator, M, N, K, float> &d, const float *p,
+                 unsigned ldm, nvcuda::wmma::layout_t layout) {
+  float2 v0 =
+      ((const float2 *)p)[ldm / 2 * (threadIdx.x / 4) + threadIdx.x % 4];
+  float2 v1 =
+      ((const float2 *)p)[ldm / 2 * (threadIdx.x / 4 + 8) + threadIdx.x % 4];
+
+  d.x[0] = v0.x;
+  d.x[1] = v0.y;
+  d.x[2] = v1.x;
+  d.x[3] = v1.y;
+}
+
+__device__ inline void
 store_matrix_sync(float *p, const fragment<accumulator, M, N, K, float> &d,
                   unsigned ldm, nvcuda::wmma::layout_t layout) {
   ((float2 *)p)[ldm / 2 * (threadIdx.x / 4) + threadIdx.x % 4] =
@@ -68,11 +82,8 @@ __global__ void kernel(const float *A, const float *B, float *C) {
 
   fragment<matrix_a, M, N, K, DTYPE, row_major> a;
   fragment<matrix_b, M, N, K, DTYPE, col_major> b;
-  fragment<accumulator, M, N, K, float> c, d;
-  fill_fragment(c, 0.0f);
-  fill_fragment(d, 0.0f);
+  fragment<accumulator, M, N, K, float> c;
 
-  // Convert FP32 inputs to FP8 storage format
   __shared__ __nv_fp8_storage_t tmpA[M * K];
   __shared__ __nv_fp8_storage_t tmpB[K * N];
 
@@ -86,13 +97,14 @@ __global__ void kernel(const float *A, const float *B, float *C) {
 
   __syncthreads();
 
-  // Load fragments from the FP8 arrays
+  // Load fragments
   load_matrix_sync(a, reinterpret_cast<const DTYPE *>(tmpA), K);
   load_matrix_sync(b, reinterpret_cast<const DTYPE *>(tmpB), K);
+  load_matrix_sync(c, C, N, mem_row_major);
 
   // Perform matrix multiplication
-  mma_sync_ptx(c, a, b, d);
+  mma_sync_ptx(c, a, b, c);
 
   // Store result
-  store_matrix_sync(C, c, N, nvcuda::wmma::mem_row_major);
+  store_matrix_sync(C, c, N, mem_row_major);
 }

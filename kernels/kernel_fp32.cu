@@ -11,7 +11,7 @@ __global__ void kernel(const float *A, const float *B, float *C) {
         const float b = B[n * K + k]; // B is column-major (KxN)
         sum += a * b;
       }
-      C[m * N + n] = sum; // Row-major output
+      C[m * N + n] += sum; // Row-major output
     }
   }
 }

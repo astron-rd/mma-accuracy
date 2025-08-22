@@ -41,7 +41,8 @@ void GEMM_GPU::compute(const float *A, const float *B, float *C) {
       cudaMemcpy(d_a_, A, sizeof(float) * M_ * K_, cudaMemcpyHostToDevice));
   CUDA_CHECK(
       cudaMemcpy(d_b_, B, sizeof(float) * K_ * N_, cudaMemcpyHostToDevice));
-  CUDA_CHECK(cudaMemset(d_c_, 0, sizeof(float) * M_ * N_));
+  CUDA_CHECK(
+      cudaMemcpy(d_c_, C, sizeof(float) * M_ * N_, cudaMemcpyHostToDevice));
 
   dim3 threads(32);
   dim3 grid(1);
