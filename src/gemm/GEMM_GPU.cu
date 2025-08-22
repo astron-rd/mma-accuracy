@@ -4,7 +4,7 @@
 
 #include <cuda_runtime.h>
 
-#include "GEMM_GPU.h"
+#include "gemm/gpu/GEMM_GPU.h"
 
 #define CUDA_CHECK(call)                                                       \
   do {                                                                         \

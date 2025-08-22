@@ -1,3 +1,5 @@
+#pragma once
+
 #include "GEMM_GPU.h"
 
 __global__ void kernel(const float *A, const float *B, float *C);

@@ -1,4 +1,4 @@
-#include "GEMM.h"
+#include "gemm/GEMM.h"
 
 GEMM::GEMM(size_t M, size_t N, size_t K) : M_(M), N_(N), K_(K) {}
 

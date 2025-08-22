@@ -1,5 +1,5 @@
-#include "GEMM.h"
-#include "GEMM_E5M2.cuh"
+#include <gemm.h>
+
 #include "test_precisision.h"
 
 int main() {
@@ -8,9 +8,9 @@ int main() {
   constexpr size_t K = 32;
 
   GEMM reference(M, N, K);
-  GEMM_E5M2 gpu(M, N, K);
+  GEMM_E4M3 gpu(M, N, K);
 
-  run_test(M, N, K, reference, gpu, FP8_E5M2_MIN_NORMAL, FP8_E5M2_MAX_NORMAL);
+  run_test(M, N, K, reference, gpu, FP8_E4M3_MIN_NORMAL, FP8_E4M3_MAX_NORMAL);
 
   return 0;
 }

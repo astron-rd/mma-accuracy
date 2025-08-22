@@ -1,6 +1,8 @@
+#pragma once
+
 #include <cuda_runtime.h>
 
-#include "GEMM.h"
+#include "gemm/GEMM.h"
 
 class GEMM_GPU : public GEMM {
 public:

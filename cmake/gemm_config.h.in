@@ -1,0 +1,5 @@
+#cmakedefine HAVE_FP32
+#cmakedefine HAVE_FP16
+#cmakedefine HAVE_BF16
+#cmakedefine HAVE_FP8
+#cmakedefine HAVE_FP6

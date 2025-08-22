@@ -3,7 +3,7 @@
 #include <iostream>
 #include <vector>
 
-#include "GEMM.h"
+#include "gemm/GEMM.h"
 
 double inline compute_max_normal_value(int exponent_bits, int mantissa_bits) {
   const double bias = std::pow(2, exponent_bits - 1) - 1;

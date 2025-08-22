@@ -2,7 +2,8 @@
 #include <random>
 #include <vector>
 
-#include "GEMM.h"
+#include <gemm.h>
+
 #include "helper.h"
 
 template <typename T> std::vector<T> logspace(T start, T end, std::size_t n) {

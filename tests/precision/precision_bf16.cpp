@@ -1,5 +1,5 @@
-#include "GEMM.h"
-#include "GEMM_BF16.cuh"
+#include <gemm.h>
+
 #include "test_precisision.h"
 
 int main() {

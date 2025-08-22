@@ -1,9 +1,11 @@
+#pragma once
+
 #include "GEMM_GPU.h"
 
 __global__ void kernel(const float *A, const float *B, float *C);
-class GEMM_E4M3 : public GEMM_GPU {
+class GEMM_E3M2 : public GEMM_GPU {
 public:
-  GEMM_E4M3(size_t M, size_t N, size_t K) : GEMM_GPU(M, N, K){};
+  GEMM_E3M2(size_t M, size_t N, size_t K) : GEMM_GPU(M, N, K){};
 
 private:
   void launch(const float *d_a, const float *d_b, float *d_c) override {
