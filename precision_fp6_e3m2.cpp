@@ -1,6 +1,6 @@
 #include "GEMM.h"
-#include "GEMM_E3M2.h"
-#include "helper.h"
+#include "GEMM_E3M2.cuh"
+#include "test_precisision.h"
 
 int main() {
   constexpr size_t M = 16;
