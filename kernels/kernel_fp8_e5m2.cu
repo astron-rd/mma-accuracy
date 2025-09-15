@@ -32,13 +32,13 @@ mma_sync_ptx(fragment<accumulator, M, N, K, float> &d,
         "r"(b.x[1]), "f"(c.x[0]), "f"(c.x[1]), "f"(c.x[2]), "f"(c.x[3]));
 }
 
+inline __device__ unsigned laneid() { return threadIdx.x; }
+
 __device__ inline void
 load_matrix_sync(fragment<accumulator, M, N, K, float> &d, const float *p,
                  unsigned ldm, nvcuda::wmma::layout_t layout) {
-  float2 v0 =
-      ((const float2 *)p)[ldm / 2 * (threadIdx.x / 4) + threadIdx.x % 4];
-  float2 v1 =
-      ((const float2 *)p)[ldm / 2 * (threadIdx.x / 4 + 8) + threadIdx.x % 4];
+  float2 v0 = ((const float2 *)p)[ldm / 2 * (laneid() / 4) + laneid() % 4];
+  float2 v1 = ((const float2 *)p)[ldm / 2 * (laneid() / 4 + 8) + laneid() % 4];
 
   d.x[0] = v0.x;
   d.x[1] = v0.y;
@@ -49,13 +49,11 @@ load_matrix_sync(fragment<accumulator, M, N, K, float> &d, const float *p,
 __device__ inline void
 store_matrix_sync(float *p, const fragment<accumulator, M, N, K, float> &d,
                   unsigned ldm, nvcuda::wmma::layout_t layout) {
-  ((float2 *)p)[ldm / 2 * (threadIdx.x / 4) + threadIdx.x % 4] =
+  ((float2 *)p)[ldm / 2 * (laneid() / 4) + laneid() % 4] =
       make_float2(d.x[0], d.x[1]);
-  ((float2 *)p)[ldm / 2 * (threadIdx.x / 4 + 8) + threadIdx.x % 4] =
+  ((float2 *)p)[ldm / 2 * (laneid() / 4 + 8) + laneid() % 4] =
       make_float2(d.x[2], d.x[3]);
 }
-
-inline __device__ unsigned laneid() { return threadIdx.x; }
 
 template <typename T>
 inline __device__ void
